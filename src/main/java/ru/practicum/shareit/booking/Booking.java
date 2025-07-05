@@ -11,5 +11,5 @@ public class Booking {
     private Long bookerId;
     private String start;
     private String end;
-    private String status; // "WAITING", "APPROVED", "REJECTED"
+    private BookingStatus status;
 }
