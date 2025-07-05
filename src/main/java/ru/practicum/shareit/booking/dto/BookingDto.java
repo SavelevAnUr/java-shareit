@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
+import ru.practicum.shareit.booking.BookingStatus;
 
 @Data
 @NoArgsConstructor
@@ -10,4 +11,5 @@ public class BookingDto {
     private Long itemId;
     private String start;
     private String end;
+    private BookingStatus status;
 }

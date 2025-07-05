@@ -7,19 +7,27 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-    // Маппинг из BookingDto + дополнительных параметров в Booking
-    @Mapping(source = "itemId", target = "itemId")
-    @Mapping(source = "start", target = "start")
-    @Mapping(source = "end", target = "end")
-    @Mapping(source = "bookerId", target = "bookerId")
-    @Mapping(source = "status", target = "status")
-    Booking toBooking(BookingDto dto, Long bookerId, BookingStatus status);
+    default Booking toBooking(BookingDto dto, Long bookerId, BookingStatus status) {
+        if (dto == null) return null;
 
-    // Маппинг из Booking в BookingDto
-    @Mapping(source = "id", target = "id")
-    @Mapping(source = "itemId", target = "itemId")
-    @Mapping(source = "start", target = "start")
-    @Mapping(source = "end", target = "end")
-    @Mapping(source = "status", target = "status")
-    BookingDto toBookingDto(Booking booking);
+        Booking booking = new Booking();
+        booking.setItemId(dto.getItemId());
+        booking.setStart(dto.getStart());
+        booking.setEnd(dto.getEnd());
+        booking.setBookerId(bookerId);
+        booking.setStatus(status);
+        return booking;
+    }
+
+    default BookingDto toBookingDto(Booking booking) {
+        if (booking == null) return null;
+
+        BookingDto dto = new BookingDto();
+        dto.setId(booking.getId());
+        dto.setItemId(booking.getItemId());
+        dto.setStart(booking.getStart());
+        dto.setEnd(booking.getEnd());
+        dto.setStatus(booking.getStatus()); // Если нужно
+        return dto;
+    }
 }
