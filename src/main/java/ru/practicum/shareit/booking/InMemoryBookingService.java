@@ -18,7 +18,7 @@ public class InMemoryBookingService implements BookingService {
 
     @Override
     public BookingDto createBooking(Long bookerId, BookingDto bookingDto) {
-        Booking booking = bookingMapper.toBooking(bookingDto, bookerId, BookingStatus.WAITING.name());
+        Booking booking = bookingMapper.toBooking(bookingDto, bookerId, BookingStatus.WAITING);
         booking.setId(idCounter.getAndIncrement());
         bookings.put(booking.getId(), booking);
         return bookingMapper.toBookingDto(booking);
