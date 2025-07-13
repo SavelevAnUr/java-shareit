@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking;
 
 import org.mapstruct.Mapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.UserDto;
@@ -38,5 +39,11 @@ public interface BookingMapper {
         booking.setEnd(bookingDto.getEnd());
         // item и booker нужно устанавливать в сервисе, по id загружая сущности
         return booking;
+    }
+    public static BookingShortDto toBookingShortDto(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+        return new BookingShortDto(booking.getId(), booking.getBooker().getId());
     }
 }

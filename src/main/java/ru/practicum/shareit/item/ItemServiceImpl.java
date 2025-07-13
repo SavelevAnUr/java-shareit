@@ -5,7 +5,9 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingMapper;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.comment.CommentMapper;
@@ -85,12 +87,25 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id=" + itemId + " not found"));
 
-        ItemDto itemDto = ItemMapper.toItemDto(item);
+        LocalDateTime now = LocalDateTime.now();
 
-        // Здесь можно добавить логику для добавления комментариев и другой информации
+        BookingShortDto lastBooking = bookingRepository.findByItemIdAndEndBeforeOrderByStartDesc(itemId, now).stream()
+                .findFirst()
+                .map(BookingMapper::toBookingShortDto)
+                .orElse(null);
 
-        return itemDto;
+        BookingShortDto nextBooking = bookingRepository.findByItemIdAndStartAfterOrderByStartAsc(itemId, now).stream()
+                .findFirst()
+                .map(BookingMapper::toBookingShortDto)
+                .orElse(null);
+
+        List<CommentDto> comments = commentRepository.findByItemIdOrderByCreatedDesc(itemId).stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
+        return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
     }
+
 
     @Override
     @Transactional(readOnly = true)
