@@ -46,7 +46,7 @@ public class InMemoryBookingService implements BookingService {
         UserDto userDto = userService.getUserById(bookerId);
         User booker = UserMapper.toUser(userDto);
 
-        Booking booking = bookingMapper.toBooking(bookingDto, item, booker, BookingStatus.WAITING);
+        Booking booking = BookingMapper.toBooking(bookingDto, item, booker, BookingStatus.WAITING);
         booking.setId(idCounter.getAndIncrement());
         booking.setItem(item);
         booking.setBooker(booker);
