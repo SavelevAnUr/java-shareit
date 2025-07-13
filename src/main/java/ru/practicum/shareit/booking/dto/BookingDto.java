@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.dto;
 
-import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.UserDto;
 
 import java.time.LocalDateTime;
@@ -9,19 +8,19 @@ public class BookingDto {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private ItemDto item;      // вложенный объект ItemDto
-    private UserDto booker;    // вложенный объект UserDto
-    private String status;     // или enum BookingStatus, зависит от вашей реализации
+    private Long itemId;       // изменено: вместо ItemDto item
+    private UserDto booker;
+    private String status;
 
     public BookingDto() {
     }
 
     public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                      ItemDto item, UserDto booker, String status) {
+                      Long itemId, UserDto booker, String status) {
         this.id = id;
         this.start = start;
         this.end = end;
-        this.item = item;
+        this.itemId = itemId;
         this.booker = booker;
         this.status = status;
     }
@@ -52,12 +51,12 @@ public class BookingDto {
         this.end = end;
     }
 
-    public ItemDto getItem() {
-        return item;
+    public Long getItemId() {
+        return itemId;
     }
 
-    public void setItem(ItemDto item) {
-        this.item = item;
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
     }
 
     public UserDto getBooker() {
