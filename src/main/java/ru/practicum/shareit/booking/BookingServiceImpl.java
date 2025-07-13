@@ -36,8 +36,12 @@ public class BookingServiceImpl implements BookingService {
         User booker = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id=" + userId));
 
-        Item item = itemRepository.findById(bookingDto.getItemId())
-                .orElseThrow(() -> new NotFoundException("Item not found with id=" + bookingDto.getItemId()));
+        if (bookingDto.getItem() == null || bookingDto.getItem().getId() == null) {
+            throw new ValidationException("Item id must be provided");
+        }
+
+        Item item = itemRepository.findById(bookingDto.getItem().getId())
+                .orElseThrow(() -> new NotFoundException("Item not found with id=" + bookingDto.getItem().getId()));
 
         if (!item.getAvailable()) {
             throw new ValidationException("Item with id=" + item.getId() + " is not available for booking");

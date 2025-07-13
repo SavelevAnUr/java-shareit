@@ -9,10 +9,24 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BookingDto {
     private Long id;
-    private Long itemId;
-    private String itemName;
-    private Long bookerId;
+    private ItemShortDto item;
+    private UserShortDto booker;
     private LocalDateTime start;
     private LocalDateTime end;
     private BookingStatus status;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ItemShortDto {
+        private Long id;
+        private String name;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class UserShortDto {
+        private Long id;
+    }
 }

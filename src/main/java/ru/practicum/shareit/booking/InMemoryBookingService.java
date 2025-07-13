@@ -35,7 +35,11 @@ public class InMemoryBookingService implements BookingService {
 
     @Override
     public BookingDto createBooking(Long bookerId, BookingDto bookingDto) {
-        ItemDto itemDto = itemService.getItemById(bookingDto.getItemId());
+        if (bookingDto.getItem() == null || bookingDto.getItem().getId() == null) {
+            throw new IllegalArgumentException("Item id must be provided");
+        }
+
+        ItemDto itemDto = itemService.getItemById(bookingDto.getItem().getId());
         Long ownerId = itemDto.getOwnerId();
         Item item = ItemMapper.toItem(itemDto, ownerId);
 
