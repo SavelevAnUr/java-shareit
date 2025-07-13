@@ -11,7 +11,6 @@ import ru.practicum.shareit.user.UserMapper;
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-
     public static BookingDto toBookingDto(Booking booking) {
         if (booking == null) {
             return null;
@@ -37,9 +36,9 @@ public interface BookingMapper {
         Booking booking = new Booking();
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
-        // item и booker нужно устанавливать в сервисе, по id загружая сущности
         return booking;
     }
+
     public static BookingShortDto toBookingShortDto(Booking booking) {
         if (booking == null) {
             return null;

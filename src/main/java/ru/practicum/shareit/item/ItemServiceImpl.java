@@ -20,11 +20,13 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @Primary
+@RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -33,18 +35,38 @@ public class ItemServiceImpl implements ItemService {
     private final CommentMapper commentMapper;
     private final BookingRepository bookingRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository,
-                           UserRepository userRepository,
-                           CommentRepository commentRepository,
-                           BookingRepository bookingRepository,
-                           CommentMapper commentMapper) {
-        this.itemRepository = itemRepository;
-        this.userRepository = userRepository;
-        this.commentRepository = commentRepository;
-        this.commentMapper = commentMapper;
-        this.bookingRepository = bookingRepository;
+    @Override
+    @Transactional(readOnly = true)
+    public ItemDto getItemById(Long itemId) {
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Item with id=" + itemId + " not found"));
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // Получаем последнее завершенное бронирование
+        BookingShortDto lastBooking = bookingRepository.findByItemIdAndEndBeforeOrderByStartDesc(itemId, now)
+                .stream()
+                .findFirst()
+                .map(BookingMapper::toBookingShortDto)
+                .orElse(null);
+
+        // Получаем следующее бронирование
+        BookingShortDto nextBooking = bookingRepository.findByItemIdAndStartAfterOrderByStartAsc(itemId, now)
+                .stream()
+                .findFirst()
+                .map(BookingMapper::toBookingShortDto)
+                .orElse(null);
+
+        // Получаем все комментарии
+        List<CommentDto> comments = commentRepository.findByItemIdOrderByCreatedDesc(itemId)
+                .stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
+        return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
     }
 
+    // Остальные методы остаются без изменений
     @Override
     @Transactional
     public ItemDto addItem(Long userId, ItemDto itemDto) {
@@ -83,36 +105,27 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public ItemDto getItemById(Long itemId) {
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Item with id=" + itemId + " not found"));
-
-        LocalDateTime now = LocalDateTime.now();
-
-        BookingShortDto lastBooking = bookingRepository.findByItemIdAndEndBeforeOrderByStartDesc(itemId, now).stream()
-                .findFirst()
-                .map(BookingMapper::toBookingShortDto)
-                .orElse(null);
-
-        BookingShortDto nextBooking = bookingRepository.findByItemIdAndStartAfterOrderByStartAsc(itemId, now).stream()
-                .findFirst()
-                .map(BookingMapper::toBookingShortDto)
-                .orElse(null);
-
-        List<CommentDto> comments = commentRepository.findByItemIdOrderByCreatedDesc(itemId).stream()
-                .map(commentMapper::toCommentDto)
-                .collect(Collectors.toList());
-
-        return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
-    }
-
-
-    @Override
-    @Transactional(readOnly = true)
     public List<ItemDto> getAllItemsByOwner(Long ownerId) {
         List<Item> items = itemRepository.findAllByOwnerId(ownerId);
         return items.stream()
-                .map(ItemMapper::toItemDto)
+                .map(item -> {
+                    LocalDateTime now = LocalDateTime.now();
+                    BookingShortDto lastBooking = bookingRepository.findByItemIdAndEndBeforeOrderByStartDesc(item.getId(), now)
+                            .stream()
+                            .findFirst()
+                            .map(BookingMapper::toBookingShortDto)
+                            .orElse(null);
+                    BookingShortDto nextBooking = bookingRepository.findByItemIdAndStartAfterOrderByStartAsc(item.getId(), now)
+                            .stream()
+                            .findFirst()
+                            .map(BookingMapper::toBookingShortDto)
+                            .orElse(null);
+                    List<CommentDto> comments = commentRepository.findByItemIdOrderByCreatedDesc(item.getId())
+                            .stream()
+                            .map(commentMapper::toCommentDto)
+                            .collect(Collectors.toList());
+                    return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
+                })
                 .collect(Collectors.toList());
     }
 
