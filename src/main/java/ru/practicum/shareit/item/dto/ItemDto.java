@@ -15,4 +15,5 @@ public class ItemDto {
     private String description;
     @NotNull(message = "Available field must not be null")
     private Boolean available;
+    private Long ownerId;
 }

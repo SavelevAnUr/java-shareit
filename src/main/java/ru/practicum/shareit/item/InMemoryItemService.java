@@ -5,6 +5,7 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.UserService;
+import ru.practicum.shareit.comment.CommentDto;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,7 +38,7 @@ public class InMemoryItemService implements ItemService {
         if (item == null) return null;
 
         // Проверяем, является ли текущий пользователь владельцем
-        if (!item.getOwnerId().equals(userId)) {
+        if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Item with id=" + itemId + " not found for user=" + userId);
         }
 
@@ -56,7 +57,7 @@ public class InMemoryItemService implements ItemService {
     @Override
     public List<ItemDto> getAllItemsByOwner(Long ownerId) {
         return items.values().stream()
-                .filter(i -> i.getOwnerId().equals(ownerId))
+                .filter(i -> i.getOwner().getId().equals(ownerId))
                 .map(ItemMapper::toItemDto)
                 .toList();
     }
@@ -75,5 +76,14 @@ public class InMemoryItemService implements ItemService {
                                 item.getDescription().toLowerCase().contains(lowerText)))
                 .map(ItemMapper::toItemDto)
                 .toList();
+    }
+
+    @Override
+    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+        Item item = items.get(itemId);
+        if (item == null) {
+            throw new NotFoundException("Item not found with id " + itemId);
+        }
+        return commentDto;
     }
 }
