@@ -1,13 +1,16 @@
 package ru.practicum.shareit.booking;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
-import ru.practicum.shareit.exception.ValidationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.User;
@@ -19,20 +22,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Primary
+@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
 
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-
-    public BookingServiceImpl(BookingRepository bookingRepository,
-                              UserRepository userRepository,
-                              ItemRepository itemRepository) {
-        this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
-        this.itemRepository = itemRepository;
-    }
 
     @Override
     @Transactional
@@ -51,8 +47,12 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Owner cannot book own item");
         }
 
-        if (bookingDto.getStart().isAfter(bookingDto.getEnd()) || bookingDto.getStart().isEqual(bookingDto.getEnd())) {
-            throw new ValidationException("Invalid booking time range");
+        if (bookingDto.getStart() == null || bookingDto.getEnd() == null) {
+            throw new ValidationException("Start and end dates must not be null");
+        }
+
+        if (!bookingDto.getStart().isBefore(bookingDto.getEnd())) {
+            throw new ValidationException("Start date must be before end date");
         }
 
         Booking booking = Booking.builder()
@@ -63,8 +63,7 @@ public class BookingServiceImpl implements BookingService {
                 .status(BookingStatus.WAITING)
                 .build();
 
-        Booking saved = bookingRepository.save(booking);
-        return BookingMapper.toBookingDto(saved);
+        return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -77,13 +76,12 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("User with id=" + ownerId + " is not owner of item");
         }
 
-        if (booking.getStatus() == BookingStatus.APPROVED && approved) {
+        if (booking.getStatus() == BookingStatus.APPROVED && Boolean.TRUE.equals(approved)) {
             throw new ValidationException("Booking is already approved");
         }
 
         booking.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-        Booking updated = bookingRepository.save(booking);
-        return BookingMapper.toBookingDto(updated);
+        return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
     @Override
@@ -91,7 +89,10 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found with id=" + bookingId));
 
-        if (!booking.getBooker().getId().equals(userId) && !booking.getItem().getOwner().getId().equals(userId)) {
+        boolean isBooker = booking.getBooker().getId().equals(userId);
+        boolean isOwner = booking.getItem().getOwner().getId().equals(userId);
+
+        if (!isBooker && !isOwner) {
             throw new NotFoundException("User with id=" + userId + " has no access to booking id=" + bookingId);
         }
 
@@ -100,12 +101,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingsByUser(Long userId, String state, int from, int size) {
+        // Проверяем пользователя
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id=" + userId));
 
+        validatePagination(from, size);
+
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
-
         List<Booking> bookings;
 
         switch (state.toUpperCase()) {
@@ -138,12 +141,14 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingsByOwner(Long ownerId, String state, int from, int size) {
+        // Проверяем владельца
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("User not found with id=" + ownerId));
 
+        validatePagination(from, size);
+
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
-
         List<Booking> bookings;
 
         switch (state.toUpperCase()) {
@@ -173,15 +178,23 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
     }
+
     @Override
     public List<BookingDto> getAllBookingsByBooker(Long bookerId) {
-        // Можно вызвать существующий метод getBookingsByUser с параметрами по умолчанию
         return getBookingsByUser(bookerId, "ALL", 0, Integer.MAX_VALUE);
     }
 
     @Override
     public List<BookingDto> getAllBookingsByOwner(Long ownerId) {
-        // Аналогично
         return getBookingsByOwner(ownerId, "ALL", 0, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Проверяет корректность параметров пагинации
+     */
+    private void validatePagination(int from, int size) {
+        if (from < 0 || size <= 0) {
+            throw new ValidationException("Invalid pagination parameters: from=" + from + ", size=" + size);
+        }
     }
 }
