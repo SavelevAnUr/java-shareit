@@ -2,45 +2,41 @@ package ru.practicum.shareit.booking;
 
 import org.mapstruct.Mapper;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.user.UserDto;
 import ru.practicum.shareit.user.UserMapper;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-    // Преобразование из Booking в BookingDto
-    static BookingDto toBookingDto(Booking booking) {
+
+    public static BookingDto toBookingDto(Booking booking) {
         if (booking == null) {
             return null;
         }
-
-        UserDto userDto = UserMapper.toUserDto(booking.getBooker());
+        UserDto bookerDto = UserMapper.toUserDto(booking.getBooker());
+        ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
 
         return new BookingDto(
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
                 booking.getItem() != null ? booking.getItem().getId() : null,
-                userDto,
+                itemDto,
+                bookerDto,
                 booking.getStatus().name()
         );
     }
 
-    // Преобразование из BookingDto в Booking
-    static Booking toBooking(BookingDto bookingDto, Item item, User booker, BookingStatus status) {
+    public static Booking toBooking(BookingDto bookingDto) {
         if (bookingDto == null) {
             return null;
         }
-
         Booking booking = new Booking();
         booking.setStart(bookingDto.getStart());
         booking.setEnd(bookingDto.getEnd());
-        booking.setItem(item);
-        booking.setBooker(booker);
-        booking.setStatus(status);
-
+        // item и booker нужно устанавливать в сервисе, по id загружая сущности
         return booking;
     }
 }

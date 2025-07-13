@@ -1,5 +1,8 @@
 package ru.practicum.shareit.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.UserDto;
 
 import java.time.LocalDateTime;
@@ -8,7 +11,15 @@ public class BookingDto {
     private Long id;
     private LocalDateTime start;
     private LocalDateTime end;
-    private Long itemId;       // изменено: вместо ItemDto item
+
+    // Принимаем itemId в запросе
+    private Long itemId;
+
+    // Возвращаем вложенный объект item в ответе
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private ItemDto item;
+
     private UserDto booker;
     private String status;
 
@@ -16,11 +27,12 @@ public class BookingDto {
     }
 
     public BookingDto(Long id, LocalDateTime start, LocalDateTime end,
-                      Long itemId, UserDto booker, String status) {
+                      Long itemId, ItemDto item, UserDto booker, String status) {
         this.id = id;
         this.start = start;
         this.end = end;
         this.itemId = itemId;
+        this.item = item;
         this.booker = booker;
         this.status = status;
     }
@@ -57,6 +69,14 @@ public class BookingDto {
 
     public void setItemId(Long itemId) {
         this.itemId = itemId;
+    }
+
+    public ItemDto getItem() {
+        return item;
+    }
+
+    public void setItem(ItemDto item) {
+        this.item = item;
     }
 
     public UserDto getBooker() {
