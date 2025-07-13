@@ -1,18 +1,23 @@
 package ru.practicum.shareit.item;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.BookingRepository;
 import ru.practicum.shareit.comment.Comment;
 import ru.practicum.shareit.comment.CommentDto;
 import ru.practicum.shareit.comment.CommentMapper;
 import ru.practicum.shareit.comment.CommentRepository;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,15 +29,18 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
+    private final BookingRepository bookingRepository;
 
     public ItemServiceImpl(ItemRepository itemRepository,
                            UserRepository userRepository,
                            CommentRepository commentRepository,
+                           BookingRepository bookingRepository,
                            CommentMapper commentMapper) {
         this.itemRepository = itemRepository;
         this.userRepository = userRepository;
         this.commentRepository = commentRepository;
         this.commentMapper = commentMapper;
+        this.bookingRepository = bookingRepository;
     }
 
     @Override
@@ -114,12 +122,16 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
 
-        // TODO: добавить проверку, что пользователь бронировал этот item и может оставить комментарий
+        // Проверка, что пользователь бронировал эту вещь и бронирование завершилось
+        List<Booking> bookings = bookingRepository.findByBookerIdAndItemIdAndEndBefore(userId, itemId, LocalDateTime.now());
+        if (bookings.isEmpty()) {
+            throw new ValidationException("User has not completed a booking for this item and cannot comment");
+        }
 
         Comment comment = commentMapper.toComment(commentDto);
         comment.setItem(item);
         comment.setAuthor(user);
-        comment.setCreated(java.time.LocalDateTime.now());
+        comment.setCreated(LocalDateTime.now());
 
         Comment saved = commentRepository.save(comment);
         return commentMapper.toCommentDto(saved);

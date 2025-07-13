@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingStatus;
+import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
@@ -77,7 +78,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Booking not found with id=" + bookingId));
 
         if (!booking.getItem().getOwner().getId().equals(ownerId)) {
-            throw new NotFoundException("User with id=" + ownerId + " is not owner of item");
+            throw new ForbiddenException("User with id=" + ownerId + " is not owner of item");
         }
 
         if (booking.getStatus() == BookingStatus.APPROVED && Boolean.TRUE.equals(approved)) {
