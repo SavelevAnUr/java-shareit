@@ -62,7 +62,6 @@ public class InMemoryBookingService implements BookingService {
         Booking booking = bookings.get(bookingId);
         if (booking == null) return null;
 
-        // Проверяем, что пользователь либо бронирующий, либо владелец предмета
         boolean isBooker = booking.getBooker().getId().equals(userId);
         boolean isOwner = booking.getItem().getOwner().getId().equals(userId);
 
@@ -148,7 +147,6 @@ public class InMemoryBookingService implements BookingService {
                 throw new IllegalArgumentException("Unknown state: " + state);
         }
 
-        // Применяем пагинацию
         int toIndex = Math.min(from + size, filtered.size());
         List<Booking> paginated = (from <= filtered.size()) ? filtered.subList(from, toIndex) : Collections.emptyList();
 
@@ -198,7 +196,6 @@ public class InMemoryBookingService implements BookingService {
                 throw new IllegalArgumentException("Unknown state: " + state);
         }
 
-        // Применяем пагинацию
         int toIndex = Math.min(from + size, filtered.size());
         List<Booking> paginated = (from <= filtered.size()) ? filtered.subList(from, toIndex) : Collections.emptyList();
 

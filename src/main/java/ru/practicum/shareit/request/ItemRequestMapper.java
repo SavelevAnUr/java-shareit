@@ -16,7 +16,7 @@ public class ItemRequestMapper {
                 .id(request.getId())
                 .description(request.getDescription())
                 .created(request.getCreated())
-                .items(Collections.emptyList()) // или реальный список
+                .items(Collections.emptyList())
                 .build();
     }
 }

@@ -32,7 +32,6 @@ public class InMemoryUserService implements UserService {
             throw new NotFoundException("User with id=" + userId + " not found");
         }
 
-        // Обновляем только ненулевые поля
         if (userDto.getName() != null) {
             existing.setName(userDto.getName());
         }

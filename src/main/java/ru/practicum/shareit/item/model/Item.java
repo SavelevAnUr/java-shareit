@@ -29,5 +29,5 @@ public class Item {
     private User owner;
 
     @Column(name = "request_id")
-    private Long requestId; // Можно позже сделать связь @ManyToOne с Request
+    private Long requestId;
 }

@@ -1,5 +1,6 @@
 package ru.practicum.shareit.comment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,5 +18,7 @@ public class CommentDto {
     private String text;
 
     private String authorName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS")
     private LocalDateTime created;
 }

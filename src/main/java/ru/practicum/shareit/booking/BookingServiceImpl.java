@@ -7,8 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDto;
-import ru.practicum.shareit.booking.Booking;
-import ru.practicum.shareit.booking.BookingStatus;
 import ru.practicum.shareit.exception.ForbiddenException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -194,9 +192,6 @@ public class BookingServiceImpl implements BookingService {
         return getBookingsByOwner(ownerId, "ALL", 0, Integer.MAX_VALUE);
     }
 
-    /**
-     * Проверяет корректность параметров пагинации
-     */
     private void validatePagination(int from, int size) {
         if (from < 0 || size <= 0) {
             throw new ValidationException("Invalid pagination parameters: from=" + from + ", size=" + size);

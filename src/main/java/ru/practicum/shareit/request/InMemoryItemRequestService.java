@@ -35,7 +35,6 @@ public class InMemoryItemRequestService implements ItemRequestService {
 
     @Override
     public List<ItemRequestDto> getAllRequests(Long userId, int from, int size) {
-        // В InMemory реализации можно сделать простую фильтрацию и пагинацию вручную
 
         List<ItemRequestDto> filtered = requests.values().stream()
                 .filter(r -> !r.getRequester().getId().equals(userId)) // например, исключаем запросы пользователя
@@ -54,7 +53,6 @@ public class InMemoryItemRequestService implements ItemRequestService {
         if (request == null) {
             throw new NotFoundException("Request not found with id=" + requestId);
         }
-        // Можно проверить, существует ли пользователь userId, если нужно
         return ItemRequestMapper.toItemRequestDto(request);
     }
 

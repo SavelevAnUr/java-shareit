@@ -8,31 +8,24 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    // Все бронирования пользователя, сортировка по start desc с пагинацией
     List<Booking> findByBookerIdOrderByStartDesc(Long bookerId, Pageable pageable);
 
-    // Текущие бронирования пользователя (start < now < end)
     List<Booking> findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(Long bookerId,
                                                                           LocalDateTime nowStart,
                                                                           LocalDateTime nowEnd,
                                                                           Pageable pageable);
 
-    // Прошедшие бронирования пользователя (end < now)
     List<Booking> findByBookerIdAndEndBeforeOrderByStartDesc(Long bookerId,
                                                              LocalDateTime now,
                                                              Pageable pageable);
 
-    // Будущие бронирования пользователя (start > now)
     List<Booking> findByBookerIdAndStartAfterOrderByStartDesc(Long bookerId,
                                                               LocalDateTime now,
                                                               Pageable pageable);
 
-    // Бронирования пользователя по статусу
     List<Booking> findByBookerIdAndStatusOrderByStartDesc(Long bookerId,
                                                           BookingStatus status,
                                                           Pageable pageable);
-
-    // Аналогичные методы для владельца предметов
 
     List<Booking> findByItemOwnerIdOrderByStartDesc(Long ownerId, Pageable pageable);
 
@@ -54,7 +47,9 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
                                                              Pageable pageable);
     List<Booking> findByBookerIdAndItemIdAndEndBefore(Long bookerId, Long itemId, LocalDateTime end);
 
-    List<Booking> findByItemIdAndEndBeforeOrderByStartDesc(Long itemId, LocalDateTime now);
+    List<Booking> findByItemIdAndEndBeforeOrderByStartDesc(Long itemId, LocalDateTime end);
 
     List<Booking> findByItemIdAndStartAfterOrderByStartAsc(Long itemId, LocalDateTime now);
+
+
 }

@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = UserMapper.toUser(userDto);
-        user.setId(null); // чтобы сгенерировался id
+        user.setId(null);
         user = userRepository.save(user);
         return UserMapper.toUserDto(user);
     }

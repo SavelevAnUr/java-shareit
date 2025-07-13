@@ -12,10 +12,8 @@ public class BookingDto {
     private LocalDateTime start;
     private LocalDateTime end;
 
-    // Принимаем itemId в запросе
     private Long itemId;
 
-    // Возвращаем вложенный объект item в ответе
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private ItemDto item;
@@ -36,8 +34,6 @@ public class BookingDto {
         this.booker = booker;
         this.status = status;
     }
-
-    // Геттеры и сеттеры
 
     public Long getId() {
         return id;

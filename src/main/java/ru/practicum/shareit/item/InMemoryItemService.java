@@ -22,7 +22,6 @@ public class InMemoryItemService implements ItemService {
 
     @Override
     public ItemDto addItem(Long userId, ItemDto itemDto) {
-        // Проверяем, существует ли пользователь
         userService.getUserById(userId);
 
         Item item = ItemMapper.toItem(itemDto, userId);
@@ -37,7 +36,6 @@ public class InMemoryItemService implements ItemService {
         Item item = items.get(itemId);
         if (item == null) return null;
 
-        // Проверяем, является ли текущий пользователь владельцем
         if (!item.getOwner().getId().equals(userId)) {
             throw new NotFoundException("Item with id=" + itemId + " not found for user=" + userId);
         }

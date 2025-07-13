@@ -23,14 +23,13 @@ public abstract class CommentMapper {
         return commentDto;
     }
 
-    // Реализуем маппинг вручную, чтобы поле text корректно передавалось
     public Comment toComment(CommentDto commentDto) {
         if (commentDto == null) {
             return null;
         }
         Comment comment = new Comment();
         comment.setText(commentDto.getText());
-        // author, item и created будут установлены в сервисе
+
         return comment;
     }
 }

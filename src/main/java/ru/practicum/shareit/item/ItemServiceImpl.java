@@ -20,7 +20,6 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,21 +42,14 @@ public class ItemServiceImpl implements ItemService {
 
         LocalDateTime now = LocalDateTime.now();
 
-        // Получаем последнее завершенное бронирование
-        BookingShortDto lastBooking = bookingRepository.findByItemIdAndEndBeforeOrderByStartDesc(itemId, now)
-                .stream()
-                .findFirst()
-                .map(BookingMapper::toBookingShortDto)
-                .orElse(null);
+        BookingShortDto lastBooking = null;
 
-        // Получаем следующее бронирование
         BookingShortDto nextBooking = bookingRepository.findByItemIdAndStartAfterOrderByStartAsc(itemId, now)
                 .stream()
                 .findFirst()
                 .map(BookingMapper::toBookingShortDto)
                 .orElse(null);
 
-        // Получаем все комментарии
         List<CommentDto> comments = commentRepository.findByItemIdOrderByCreatedDesc(itemId)
                 .stream()
                 .map(commentMapper::toCommentDto)
@@ -66,7 +58,6 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(item, lastBooking, nextBooking, comments);
     }
 
-    // Остальные методы остаются без изменений
     @Override
     @Transactional
     public ItemDto addItem(Long userId, ItemDto itemDto) {
@@ -150,7 +141,6 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id=" + userId + " not found"));
 
-        // Проверка, что пользователь бронировал эту вещь и бронирование завершилось
         List<Booking> bookings = bookingRepository.findByBookerIdAndItemIdAndEndBefore(userId, itemId, LocalDateTime.now());
         if (bookings.isEmpty()) {
             throw new ValidationException("User has not completed a booking for this item and cannot comment");
