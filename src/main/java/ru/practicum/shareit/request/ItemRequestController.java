@@ -27,13 +27,17 @@ public class ItemRequestController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<ItemRequestDto>> getAllRequests() {
-        return ResponseEntity.ok(requestService.getAllRequests());
+    public ResponseEntity<List<ItemRequestDto>> getAllRequests(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.ok(requestService.getAllRequests(userId, from, size));
     }
 
     @GetMapping("/{requestId}")
     public ResponseEntity<ItemRequestDto> getRequestById(
+            @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long requestId) {
-        return ResponseEntity.ok(requestService.getRequestById(requestId));
+        return ResponseEntity.ok(requestService.getRequestById(userId, requestId));
     }
 }

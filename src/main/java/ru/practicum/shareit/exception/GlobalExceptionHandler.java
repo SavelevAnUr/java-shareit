@@ -27,4 +27,10 @@ public class GlobalExceptionHandler {
     public Map<String, String> handleServerError(Exception ex) {
         return Map.of("error", "Internal server error: " + ex.getMessage());
     }
+
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ForbiddenException.class)
+    public Map<String, String> handleForbidden(ForbiddenException ex) {
+        return Map.of("error", ex.getMessage());
+    }
 }
