@@ -21,14 +21,18 @@ public class ItemMapper {
                                     BookingShortDto nextBooking,
                                     List<CommentDto> comments) {
         Long ownerId = (item.getOwner() != null) ? item.getOwner().getId() : null;
-        return new ItemDto(item.getId(),
+        Long requestId = item.getRequestId();
+        return new ItemDto(
+                item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 ownerId,
                 lastBooking,
                 nextBooking,
-                comments);
+                comments,
+                requestId
+        );
     }
 
     public static ItemDto toItemDto(Item item) {
@@ -36,13 +40,16 @@ public class ItemMapper {
             return null;
         }
         Long ownerId = (item.getOwner() != null) ? item.getOwner().getId() : null;
-        return new ItemDto(item.getId(),
+        return new ItemDto(
+                item.getId(),
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable(),
                 ownerId,
                 null,
                 null,
-                Collections.emptyList());
+                Collections.emptyList(),
+                item.getRequestId()
+        );
     }
 }

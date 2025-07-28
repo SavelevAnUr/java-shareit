@@ -18,7 +18,7 @@ public class ItemController {
     @PostMapping
     public ResponseEntity<ItemDto> addItem(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody ItemDto itemDto) {
+            @RequestBody ItemDto itemDto) {
         return ResponseEntity.ok(itemService.addItem(userId, itemDto));
     }
 
@@ -51,7 +51,7 @@ public class ItemController {
     public ResponseEntity<CommentDto> addComment(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @PathVariable Long itemId,
-            @RequestBody @Valid CommentDto commentDto) {
+            @RequestBody CommentDto commentDto) {
         return ResponseEntity.ok(itemService.addComment(userId, itemId, commentDto));
     }
 }
