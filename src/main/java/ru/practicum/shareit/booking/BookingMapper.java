@@ -1,33 +1,48 @@
 package ru.practicum.shareit.booking;
 
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.user.UserDto;
+import ru.practicum.shareit.user.UserMapper;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
 
-    default Booking toBooking(BookingDto dto, Long bookerId, BookingStatus status) {
-        if (dto == null) return null;
+    public static BookingDto toBookingDto(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+        UserDto bookerDto = UserMapper.toUserDto(booking.getBooker());
+        ItemDto itemDto = ItemMapper.toItemDto(booking.getItem());
 
+        return new BookingDto(
+                booking.getId(),
+                booking.getStart(),
+                booking.getEnd(),
+                booking.getItem() != null ? booking.getItem().getId() : null,
+                itemDto,
+                bookerDto,
+                booking.getStatus().name()
+        );
+    }
+
+    public static Booking toBooking(BookingDto bookingDto) {
+        if (bookingDto == null) {
+            return null;
+        }
         Booking booking = new Booking();
-        booking.setItemId(dto.getItemId());
-        booking.setStart(dto.getStart());
-        booking.setEnd(dto.getEnd());
-        booking.setBookerId(bookerId);
-        booking.setStatus(status);
+        booking.setStart(bookingDto.getStart());
+        booking.setEnd(bookingDto.getEnd());
         return booking;
     }
 
-    default BookingDto toBookingDto(Booking booking) {
-        if (booking == null) return null;
-
-        BookingDto dto = new BookingDto();
-        dto.setId(booking.getId());
-        dto.setItemId(booking.getItemId());
-        dto.setStart(booking.getStart());
-        dto.setEnd(booking.getEnd());
-        dto.setStatus(booking.getStatus()); // Если нужно
-        return dto;
+    public static BookingShortDto toBookingShortDto(Booking booking) {
+        if (booking == null) {
+            return null;
+        }
+        return new BookingShortDto(booking.getId(), booking.getBooker().getId());
     }
 }
