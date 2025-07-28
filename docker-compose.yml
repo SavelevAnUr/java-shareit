@@ -13,7 +13,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   shareit-server:
-    build: ./shareit-server
+    build: ./server
     ports:
       - "9090:9090"
     environment:
@@ -24,13 +24,13 @@ services:
       - postgres
 
   shareit-gateway:
-    build: ./shareit-gateway
+    build: ./gateway
     ports:
       - "8080:8080"
     environment:
-      - SHAREIT_SERVER_URL=http://shareit-server:9090
+      - SERVER_URL=http://server:9090
     depends_on:
-      - shareit-server
+      - server
 
 volumes:
   pgdata:
