@@ -19,7 +19,7 @@ public class BookingClient extends BaseClient {
         super(
                 builder
                         .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl + API_PREFIX))
-                        .requestFactory(org.springframework.http.client.SimpleClientHttpRequestFactory::new) // <<< ИЗМЕНЕНО ЗДЕСЬ
+                        .requestFactory(org.springframework.http.client.SimpleClientHttpRequestFactory::new)
                         .build()
         );
     }

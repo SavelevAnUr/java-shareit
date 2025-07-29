@@ -15,13 +15,10 @@ import java.util.List;
 public class ItemDto {
     private Long id;
 
-    @NotBlank(message = "Name must not be blank")
     private String name;
 
-    @NotBlank(message = "Description must not be blank")
     private String description;
 
-    @NotNull(message = "Available field must not be null")
     private Boolean available;
 
     private Long ownerId;

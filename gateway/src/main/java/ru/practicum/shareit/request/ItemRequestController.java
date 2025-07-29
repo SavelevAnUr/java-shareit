@@ -1,49 +1,47 @@
 package ru.practicum.shareit.request;
 
-import jakarta.validation.Valid; // Импорт для @Valid, если будет валидация DTO запроса
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
-import java.util.List;
-
-@RestController
+@Controller
 @RequestMapping("/requests")
 @RequiredArgsConstructor
-public class ItemRequestController { // Контроллер в модуле gateway
+public class ItemRequestController {
 
-    private final ItemRequestClient itemRequestClient; // Инжектим клиента вместо сервиса
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
+    private final ItemRequestClient itemRequestClient;
 
     @PostMapping
     public ResponseEntity<Object> createItemRequest(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Valid @RequestBody ItemRequestDto dto) { // Валидация на уровне контроллера
-        // Делегируем вызов клиенту
+            @RequestHeader(USER_ID_HEADER) Long userId,
+            @Valid @RequestBody ItemRequestDto dto) {
         return itemRequestClient.createItemRequest(userId, dto);
     }
 
     @GetMapping
     public ResponseEntity<Object> getAllRequestsByUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
-        // Делегируем вызов клиенту
+            @RequestHeader(USER_ID_HEADER) Long userId) {
         return itemRequestClient.getAllRequestsByUser(userId);
     }
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size) {
-        // Делегируем вызов клиенту
+            @RequestHeader(USER_ID_HEADER) Long userId,
+            @RequestParam(defaultValue = "0") @Min(0) int from,
+            @RequestParam(defaultValue = "10") @Min(1) int size) {
         return itemRequestClient.getAllRequests(userId, from, size);
     }
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getRequestById(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @PathVariable Long requestId) {
-        // Делегируем вызов клиенту
         return itemRequestClient.getRequestById(userId, requestId);
     }
 }

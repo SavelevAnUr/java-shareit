@@ -23,14 +23,20 @@ public class GlobalExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(Exception.class)
-    public Map<String, String> handleServerError(Exception ex) {
+    @ExceptionHandler(Throwable.class)
+    public Map<String, String> handleServerError(Throwable ex) {
         return Map.of("error", "Internal server error: " + ex.getMessage());
     }
 
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ExceptionHandler(ForbiddenException.class)
     public Map<String, String> handleForbidden(ForbiddenException ex) {
+        return Map.of("error", ex.getMessage());
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ValidationException.class)
+    public Map<String, String> handleValidation(ValidationException ex) {
         return Map.of("error", ex.getMessage());
     }
 }

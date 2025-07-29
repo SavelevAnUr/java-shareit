@@ -104,33 +104,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingsByUser(Long userId, String state, int from, int size) {
-        // Проверяем пользователя
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User not found with id=" + userId));
 
         validatePagination(from, size);
 
+        BookingState bookingState = BookingState.from(state);
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
 
-        switch (state.toUpperCase()) {
-            case "ALL":
+        switch (bookingState) {
+            case ALL:
                 bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId, pageable);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(userId, now, now, pageable);
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findByBookerIdAndEndBeforeOrderByStartDesc(userId, now, pageable);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findByBookerIdAndStartAfterOrderByStartDesc(userId, now, pageable);
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.WAITING, pageable);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findByBookerIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED, pageable);
                 break;
             default:
@@ -144,33 +144,33 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingsByOwner(Long ownerId, String state, int from, int size) {
-        // Проверяем владельца
         userRepository.findById(ownerId)
                 .orElseThrow(() -> new NotFoundException("User not found with id=" + ownerId));
 
         validatePagination(from, size);
 
+        BookingState bookingState = BookingState.from(state);
         Pageable pageable = PageRequest.of(from / size, size);
         LocalDateTime now = LocalDateTime.now();
         List<Booking> bookings;
 
-        switch (state.toUpperCase()) {
-            case "ALL":
+        switch (bookingState) {
+            case ALL:
                 bookings = bookingRepository.findByItemOwnerIdOrderByStartDesc(ownerId, pageable);
                 break;
-            case "CURRENT":
+            case CURRENT:
                 bookings = bookingRepository.findByItemOwnerIdAndStartBeforeAndEndAfterOrderByStartDesc(ownerId, now, now, pageable);
                 break;
-            case "PAST":
+            case PAST:
                 bookings = bookingRepository.findByItemOwnerIdAndEndBeforeOrderByStartDesc(ownerId, now, pageable);
                 break;
-            case "FUTURE":
+            case FUTURE:
                 bookings = bookingRepository.findByItemOwnerIdAndStartAfterOrderByStartDesc(ownerId, now, pageable);
                 break;
-            case "WAITING":
+            case WAITING:
                 bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.WAITING, pageable);
                 break;
-            case "REJECTED":
+            case REJECTED:
                 bookings = bookingRepository.findByItemOwnerIdAndStatusOrderByStartDesc(ownerId, BookingStatus.REJECTED, pageable);
                 break;
             default:
