@@ -12,37 +12,45 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingController {
 
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final BookingService bookingService;
 
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(
-            @RequestHeader("X-Sharer-User-Id") Long bookerId,
+            @RequestHeader(USER_ID_HEADER) Long bookerId,
             @RequestBody BookingDto bookingDto) {
         return ResponseEntity.ok(bookingService.createBooking(bookerId, bookingDto));
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDto> getBookingById(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @PathVariable Long bookingId) {
         return ResponseEntity.ok(bookingService.getBookingById(bookingId, userId));
     }
 
     @GetMapping
     public ResponseEntity<List<BookingDto>> getAllBookingsByBooker(
-            @RequestHeader("X-Sharer-User-Id") Long bookerId) {
-        return ResponseEntity.ok(bookingService.getAllBookingsByBooker(bookerId));
+            @RequestHeader(USER_ID_HEADER) Long bookerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(bookingService.getBookingsByUser(bookerId, state, from, size));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDto>> getAllBookingsByOwner(
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
-        return ResponseEntity.ok(bookingService.getAllBookingsByOwner(ownerId));
+            @RequestHeader(USER_ID_HEADER) Long ownerId,
+            @RequestParam(defaultValue = "ALL") String state,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size) {
+        return ResponseEntity.ok(bookingService.getBookingsByOwner(ownerId, state, from, size));
     }
 
     @PatchMapping("/{bookingId}")
     public ResponseEntity<BookingDto> approveBooking(
-            @RequestHeader("X-Sharer-User-Id") Long ownerId,
+            @RequestHeader(USER_ID_HEADER) Long ownerId,
             @PathVariable Long bookingId,
             @RequestParam Boolean approved) {
         return ResponseEntity.ok(bookingService.approveBooking(ownerId, bookingId, approved));

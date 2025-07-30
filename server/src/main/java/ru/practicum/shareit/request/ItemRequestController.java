@@ -11,24 +11,27 @@ import java.util.List;
 @RequestMapping("/requests")
 @RequiredArgsConstructor
 public class ItemRequestController {
+
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final ItemRequestService requestService;
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> createItemRequest(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @RequestBody ItemRequestDto dto) {
         return ResponseEntity.ok(requestService.createItemRequest(userId, dto));
     }
 
     @GetMapping
     public ResponseEntity<List<ItemRequestDto>> getAllRequestsByUser(
-            @RequestHeader("X-Sharer-User-Id") Long userId) {
+            @RequestHeader(USER_ID_HEADER) Long userId) {
         return ResponseEntity.ok(requestService.getAllRequestsByUser(userId));
     }
 
     @GetMapping("/all")
     public ResponseEntity<List<ItemRequestDto>> getAllRequests(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @RequestParam(defaultValue = "0") int from,
             @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.ok(requestService.getAllRequests(userId, from, size));
@@ -36,7 +39,7 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<ItemRequestDto> getRequestById(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @PathVariable Long requestId) {
         return ResponseEntity.ok(requestService.getRequestById(userId, requestId));
     }

@@ -13,20 +13,23 @@ import java.util.List;
 @RequestMapping("/items")
 @RequiredArgsConstructor
 public class ItemController {
+
+    private static final String USER_ID_HEADER = "X-Sharer-User-Id";
+
     private final ItemService itemService;
 
     @PostMapping
     public ResponseEntity<ItemDto> addItem(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestBody ItemDto itemDto) {
+            @RequestHeader(USER_ID_HEADER) Long userId,
+            @Valid @RequestBody ItemDto itemDto) {
         return ResponseEntity.ok(itemService.addItem(userId, itemDto));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> updateItem(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @PathVariable Long itemId,
-            @RequestBody ItemDto itemDto) {
+            @Valid @RequestBody ItemDto itemDto) {
         ItemDto updated = itemService.updateItem(userId, itemId, itemDto);
         return ResponseEntity.ok(updated);
     }
@@ -38,20 +41,21 @@ public class ItemController {
 
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAllItemsByOwner(
-            @RequestHeader("X-Sharer-User-Id") Long ownerId) {
+            @RequestHeader(USER_ID_HEADER) Long ownerId) {
         return ResponseEntity.ok(itemService.getAllItemsByOwner(ownerId));
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ItemDto>> searchItems(@RequestParam String text) {
+    public ResponseEntity<List<ItemDto>> searchItems(
+            @RequestParam String text) {
         return ResponseEntity.ok(itemService.searchItems(text));
     }
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> addComment(
-            @RequestHeader("X-Sharer-User-Id") Long userId,
+            @RequestHeader(USER_ID_HEADER) Long userId,
             @PathVariable Long itemId,
-            @RequestBody CommentDto commentDto) {
+            @Valid @RequestBody CommentDto commentDto) {
         return ResponseEntity.ok(itemService.addComment(userId, itemId, commentDto));
     }
 }
