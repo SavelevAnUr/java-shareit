@@ -14,6 +14,7 @@
 	<groupId>ru.practicum</groupId>
 	<artifactId>shareit</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 	<name>ShareIt</name>
 
 	<properties>
@@ -21,6 +22,11 @@
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
 		<lombok.version>1.18.30</lombok.version>
 	</properties>
+
+	<modules>
+		<module>server</module>
+		<module>gateway</module>
+	</modules>
 
 	<dependencies>
 		<!-- Spring Boot Web -->
